@@ -1,0 +1,120 @@
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import image as mp_image
+import matplotlib.pyplot as plt
+
+
+# Required magic to display matplotlib plots in notebooks
+%matplotlib inline
+
+!pip install opencv-python
+!pip install --upgrade scikit-image
+
+from PIL import Image
+import skimage as sk
+from skimage import io as sk_io
+from skimage import data,color
+import cv2
+cv2.__version__
+
+uno = "1.jpg"
+image = mp_image.imread(uno)
+
+# Display it
+plt.imshow(image)
+import skimage.color as sk_col
+
+# Load the image from the source file
+image = sk_io.imread(uno)
+
+# Convert to grayscale so we only have one channel
+bw_uno = sk_col.rgb2gray(image)
+
+plt.hist(bw_uno.ravel())
+plt.imshow(bw_uno, cmap = "gray")
+
+from skimage import exposure
+import numpy as np
+
+# Contrast stretching
+p2 = np.percentile(bw_uno, 2)
+p98 = np.percentile(bw_uno, 98)
+bw_uno_ct = exposure.rescale_intensity(bw_uno, in_range=(p2, p98))
+
+# Histogram Equalization
+bw_uno_eq = exposure.equalize_hist(bw_uno)
+
+# Show the images
+fig = plt.figure(figsize=(20, 12))
+
+# Subplot for original image
+a=fig.add_subplot(3,3,1)
+imgplot = plt.imshow(bw_uno)
+a.set_title('Original')
+
+# Subplot for contrast stretched image
+a=fig.add_subplot(3,3,2)
+imgplot = plt.imshow(bw_uno_ct)
+a.set_title('Contrast Stretched')
+
+# Subplot for equalized image
+a=fig.add_subplot(3,3,3)
+imgplot = plt.imshow(bw_uno_eq)
+a.set_title('Histogram Equalized')
+
+# Subplots for histograms
+a=fig.add_subplot(3,3,4)
+imgplot = plt.hist(bw_uno.ravel())
+
+a=fig.add_subplot(3,3,5)
+imgplot = plt.hist(bw_uno_ct.ravel())
+
+a=fig.add_subplot(3,3,6)
+imgplot = plt.hist(bw_uno_eq.ravel())
+
+# Subplots for CDFs
+
+a=fig.add_subplot(3,3,7)
+imgplot = plt.hist(bw_uno.ravel(), bins=255, cumulative=True)
+
+a=fig.add_subplot(3,3,8)
+imgplot = plt.hist(bw_uno_ct.ravel(), bins=255, cumulative=True)
+
+a=fig.add_subplot(3,3,9)
+imgplot = plt.hist(bw_uno_eq.ravel(), bins=255, cumulative=True)
+
+plt.show()
+
+import os
+import matplotlib.pyplot as plt
+from PIL import Image, ImageFilter
+
+edge_sobel(image):
+    from scipy import ndimage
+    import skimage.color as sc
+    import numpy as np
+    
+    dx = ndimage.sobel(bw_uno_ct, 1)  # horizontal derivative
+    dy = ndimage.sobel(bw_uno_ct, 0)  # vertical derivative
+    mag = np.hypot(dx, dy)  # magnitude
+    mag *= 255.0 / np.amax(mag)  # normalize (Q&D)
+    mag = mag.astype(np.uint8)
+    return mag
+
+sobel_image = edge_sobel(np.array(bw_uno))
+
+# Display it
+fig = plt.figure(figsize=(16, 12))
+
+# Plot original image
+a=fig.add_subplot(1, 3, 1)
+image_plot_1 = plt.imshow(bw_uno)
+a.set_title("Original")
+
+# Plot Sobel image
+a=fig.add_subplot(1, 3, 3)
+image_plot_2 = plt.imshow(sobel_image, cmap="gray") # Need to use a gray color map as we converted this to a grayscale image
+a.set_title("Sobel")
+
+plt.show()
