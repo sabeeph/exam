@@ -1,0 +1,68 @@
+import numpy as np
+import cv2 as cv
+import matplotlib.pyplot as plt
+from pathlib import Path
+import os
+from skimage import data, color
+%matplotlib inline 
+listaFile= os.listdir('.')
+listaMediacolore =[]
+
+def calcola_medie(image_file):
+    color_image = data.imread(image_file)
+    rosso_medio = np.mean(color_image[:,:,0])
+    verde_medio = np.mean(color_image[:,:,1])
+    blu_medio = np.mean(color_image[:,:,2])
+    return rosso_medio, verde_medio, blu_medio
+
+for i in range(0,len(listaFile)-1 ) :  
+    if listaFile[i].lower().endswith('.jpg')    :
+        nomeFile=listaFile[i]
+        img = cv.imread(nomeFile, cv.IMREAD_COLOR)
+        img=cv.cvtColor(img,cv.COLOR_BGR2RGB)
+        MediaColore = np.array(calcola_medie(listaFile[i]))
+        #print('rappresentazione dell immagine:{} '.format(MediaColore))
+        listaMediacolore.append(nomeFile+" ; "+str(MediaColore))
+
+with open("risultatiMediacolore.txt", "w") as output:
+    for row in listaMediacolore :
+        output.write(str(row)+ '\n') 
+        
+        
+        
+listaDominanza=[]
+
+def rosso_o_verde_o_blu(image_file):
+    plt.imshow(data.imread(image_file))
+    rosso_medio, verde_medio, blu_medio = calcola_medie(image_file)
+    if ((rosso_medio/verde_medio > 1) and (rosso_medio/blu_medio > 1)):
+        plt.title('Domina il rosso!')
+        dominant = 'rosso'
+    else: 
+        if ((verde_medio/blu_medio > 1) and (verde_medio/rosso_medio > 1)):
+            plt.title('Domina il verde!')
+            dominant = 'verde'
+        else:
+            if ((blu_medio/verde_medio > 1) and (blu_medio/rosso_medio > 1)):
+                plt.title('Domina il blu!')
+                dominant = 'blu'
+            else: 
+                ptl.title('non domina nessuno')
+                dominant = 'None'
+    return dominant
+
+for i in range(0,len(listaFile)-1 ) :  
+    if listaFile[i].lower().endswith('.jpg')    :
+        nomeFile=listaFile[i]
+        img = cv.imread(nomeFile, cv.IMREAD_COLOR)
+        img=cv.cvtColor(img,cv.COLOR_BGR2RGB)
+        Dominanza = []
+        Dominanza = rosso_o_verde_o_blu(listaFile[i])
+        #np.array(rosso_o_verde_o_blu(listaFile[i])) 
+        print('rappresentazione dell immagine:{} '.format(Dominanza))
+
+        listaDominanza.append(nomeFile+" ; "+str(Dominanza))
+
+with open("risultatiDominanza.txt", "w") as output:
+    for row in listaDominanza :
+        output.write(str(row)+ '\n') 
